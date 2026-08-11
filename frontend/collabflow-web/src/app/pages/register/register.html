@@ -1,0 +1,31 @@
+<div class="register-container">
+  <h1>Create your CollabFlow account</h1>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" />
+      @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+        <span class="error">Please enter a valid email.</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="password">Password</label>
+      <input id="password" type="password" formControlName="password" />
+      @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+        <span class="error">Password must be at least 8 characters.</span>
+      }
+    </div>
+
+    @if (errorMessage) {
+      <div class="error server-error">{{ errorMessage }}</div>
+    }
+
+    @if (successMessage) {
+      <div class="success">{{ successMessage }}</div>
+    }
+
+    <button type="submit" [disabled]="registerForm.invalid">Register</button>
+  </form>
+</div>
