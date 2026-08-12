@@ -20,7 +20,7 @@ export interface LoginResponse {
   providedIn: 'root'
 })
 export class Auth {
-  private readonly baseUrl = 'http://localhost:8080/auth';
+  private readonly baseUrl = 'http://localhost:8081/auth';
   private readonly tokenKey = 'collabflow_token';
 
   constructor(private http: HttpClient) {}
