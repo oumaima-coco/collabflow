@@ -36,7 +36,7 @@ Each service owns its own database. No service reads another service's database 
 1. A synchronous REST call through the gateway (used sparingly — e.g. project-service asking user-service "does this user exist"), or
 2. An async event via Kafka (preferred — e.g. project-service publishes `TaskAssigned`, notification-service consumes it without project-service knowing or caring who's listening)
 
-This is the constraint that makes this "real" microservices rather than a monolith split into folders — and the one most likely to come up as a discussion point in interviews.
+
 
 ## Request flow (synchronous)
 
