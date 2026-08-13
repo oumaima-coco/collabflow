@@ -1,4 +1,5 @@
 package com.collabflow.userservice;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -6,9 +7,9 @@ import org.springframework.web.client.RestClient;
 public class AuthServiceClient {
     private final RestClient restClient;
 
-    public AuthServiceClient() {
-        this.restClient = RestClient.builder()
-                .baseUrl("http://localhost:8081")
+    public AuthServiceClient(@Qualifier("loadBalancedRestClientBuilder") RestClient.Builder builder) {
+        this.restClient = builder
+                .baseUrl("http://AUTH-SERVICE")
                 .build();
     }
 
