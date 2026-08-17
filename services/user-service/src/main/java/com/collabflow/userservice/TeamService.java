@@ -53,4 +53,7 @@ public class TeamService {
                 .filter(t -> t != null)
                 .toList();
     }
+    public boolean teamExists(Long teamId) {
+        return teamRepository.existsById(teamId);
+    }
 }

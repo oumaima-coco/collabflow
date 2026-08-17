@@ -39,4 +39,9 @@ public class TeamController {
     public ResponseEntity<List<Team>> getTeamsForUser(@PathVariable Long userId) {
         return ResponseEntity.ok(teamService.getTeamsForUser(userId));
     }
+    @GetMapping("/{teamId}/exists")
+    public ResponseEntity<Boolean> teamExists(@PathVariable Long teamId) {
+        boolean exists = teamService.teamExists(teamId);
+        return ResponseEntity.ok(exists);
+    }
 }
