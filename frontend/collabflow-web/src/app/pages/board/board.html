@@ -1,0 +1,50 @@
+<div class="board">
+  <header>
+    <h1>Project Board</h1>
+    <a routerLink="/dashboard">Back to Dashboard</a>
+  </header>
+
+  <div *ngIf="loading()">Loading tasks...</div>
+  <div *ngIf="error()" class="error">{{ error() }}</div>
+
+  <div *ngIf="!loading() && !error()">
+    <button (click)="toggleForm()">{{ showForm() ? 'Cancel' : '+ New Task' }}</button>
+
+    <form *ngIf="showForm()" [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="task-form">
+      <input formControlName="title" placeholder="Task title" />
+      <textarea formControlName="description" placeholder="Description (optional)"></textarea>
+      <input formControlName="dueDate" type="date" />
+      <button type="submit" [disabled]="taskForm.invalid">Create Task</button>
+    </form>
+
+    <div class="columns">
+      <section class="column">
+        <h2>To Do</h2>
+        <div class="task-card" *ngFor="let task of todoTasks()">
+          <h3>{{ task.title }}</h3>
+          <p>{{ task.description }}</p>
+          <p *ngIf="task.dueDate">Due: {{ task.dueDate }}</p>
+          <button (click)="moveTask(task)">Start</button>
+        </div>
+      </section>
+
+      <section class="column">
+        <h2>In Progress</h2>
+        <div class="task-card" *ngFor="let task of inProgressTasks()">
+          <h3>{{ task.title }}</h3>
+          <p>{{ task.description }}</p>
+          <p *ngIf="task.dueDate">Due: {{ task.dueDate }}</p>
+          <button (click)="moveTask(task)">Complete</button>
+        </div>
+      </section>
+
+      <section class="column">
+        <h2>Done</h2>
+        <div class="task-card" *ngFor="let task of doneTasks()">
+          <h3>{{ task.title }}</h3>
+          <p>{{ task.description }}</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

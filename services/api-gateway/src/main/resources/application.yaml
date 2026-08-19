@@ -21,6 +21,19 @@ spring:
               uri: lb://PROJECT-SERVICE
               predicates:
                 - Path=/projects/**
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "http://localhost:4200"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
 
 eureka:
   client:

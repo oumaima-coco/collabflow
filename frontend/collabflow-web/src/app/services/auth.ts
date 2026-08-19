@@ -16,6 +16,12 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface UserResponse {
+  id: number;
+  email: string;
+  createdAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,6 +37,10 @@ export class Auth {
 
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, request);
+  }
+
+  getCurrentUser(): Observable<UserResponse> {
+    return this.http.get<UserResponse>(`${this.baseUrl}/me`);
   }
 
   saveToken(token: string): void {

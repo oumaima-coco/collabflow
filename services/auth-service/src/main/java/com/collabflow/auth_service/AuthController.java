@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(AuthService authService, UserRepository userRepository) {
+    public AuthController(AuthService authService, UserRepository userRepository, JwtUtil jwtUtil) {
         this.authService = authService;
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
@@ -40,6 +42,19 @@ public class AuthController {
     public ResponseEntity<Boolean> userExists(@PathVariable Long id) {
         boolean exists = userRepository.existsById(id);
         return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtUtil.extractEmail(token);
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            return ResponseEntity.ok(new UserResponse(user.getId(), user.getEmail(), user.getCreatedAt()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or missing token");
+        }
     }
 
 }

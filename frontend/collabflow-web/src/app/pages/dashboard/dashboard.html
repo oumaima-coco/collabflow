@@ -1,1 +1,38 @@
-<p>dashboard works!</p>
+<div class="dashboard">
+  <header>
+    <h1>CollabFlow Dashboard</h1>
+    <p *ngIf="userEmail()">Logged in as {{ userEmail() }}</p>
+  </header>
+
+  <div *ngIf="loading()">Loading...</div>
+
+  <div *ngIf="error()" class="error">{{ error() }}</div>
+
+  <div *ngIf="!loading() && !error()">
+    <section class="teams-section">
+      <h2>Your Teams</h2>
+      <ul *ngIf="teams().length > 0; else noTeams">
+        <li *ngFor="let team of teams()">
+          {{ team.name }} — {{ team.description }}
+        </li>
+      </ul>
+      <ng-template #noTeams>
+        <p>You don't belong to any teams yet.</p>
+      </ng-template>
+    </section>
+
+    <section class="projects-section">
+      <h2>Projects</h2>
+      <ul *ngIf="projects().length > 0; else noProjects">
+        <li *ngFor="let project of projects()">
+          <a [routerLink]="['/projects', project.id, 'board']">
+            {{ project.name }} — {{ project.description }}
+          </a>
+        </li>
+      </ul>
+      <ng-template #noProjects>
+        <p>No projects yet.</p>
+      </ng-template>
+    </section>
+  </div>
+</div>
