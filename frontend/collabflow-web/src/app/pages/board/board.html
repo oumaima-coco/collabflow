@@ -20,29 +20,66 @@
     <div class="columns">
       <section class="column">
         <h2>To Do</h2>
-        <div class="task-card" *ngFor="let task of todoTasks()">
-          <h3>{{ task.title }}</h3>
-          <p>{{ task.description }}</p>
-          <p *ngIf="task.dueDate">Due: {{ task.dueDate }}</p>
-          <button (click)="moveTask(task)">Start</button>
+        <div
+          cdkDropList
+          #todoList="cdkDropList"
+          [cdkDropListData]="todoTasks()"
+          [cdkDropListConnectedTo]="[inProgressList, doneList]"
+          (cdkDropListDropped)="drop($event, 'TODO')"
+          class="task-list"
+        >
+          <div class="task-card" *ngFor="let task of todoTasks()" cdkDrag [cdkDragData]="task">
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+            <p *ngIf="task.dueDate">Due: {{ task.dueDate }}</p>
+            <select (change)="assignTask(task, $event)">
+              <option value="">Assign to...</option>
+              <option *ngFor="let member of members()" [value]="member.userId" [selected]="task.assigneeId === member.userId">
+                User #{{ member.userId }} ({{ member.role }})
+              </option>
+            </select>
+          </div>
         </div>
       </section>
 
       <section class="column">
         <h2>In Progress</h2>
-        <div class="task-card" *ngFor="let task of inProgressTasks()">
-          <h3>{{ task.title }}</h3>
-          <p>{{ task.description }}</p>
-          <p *ngIf="task.dueDate">Due: {{ task.dueDate }}</p>
-          <button (click)="moveTask(task)">Complete</button>
+        <div
+          cdkDropList
+          #inProgressList="cdkDropList"
+          [cdkDropListData]="inProgressTasks()"
+          [cdkDropListConnectedTo]="[todoList, doneList]"
+          (cdkDropListDropped)="drop($event, 'IN_PROGRESS')"
+          class="task-list"
+        >
+          <div class="task-card" *ngFor="let task of inProgressTasks()" cdkDrag [cdkDragData]="task">
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+            <p *ngIf="task.dueDate">Due: {{ task.dueDate }}</p>
+            <select (change)="assignTask(task, $event)">
+              <option value="">Assign to...</option>
+              <option *ngFor="let member of members()" [value]="member.userId" [selected]="task.assigneeId === member.userId">
+                User #{{ member.userId }} ({{ member.role }})
+              </option>
+            </select>
+          </div>
         </div>
       </section>
 
       <section class="column">
         <h2>Done</h2>
-        <div class="task-card" *ngFor="let task of doneTasks()">
-          <h3>{{ task.title }}</h3>
-          <p>{{ task.description }}</p>
+        <div
+          cdkDropList
+          #doneList="cdkDropList"
+          [cdkDropListData]="doneTasks()"
+          [cdkDropListConnectedTo]="[todoList, inProgressList]"
+          (cdkDropListDropped)="drop($event, 'DONE')"
+          class="task-list"
+        >
+          <div class="task-card" *ngFor="let task of doneTasks()" cdkDrag [cdkDragData]="task">
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+          </div>
         </div>
       </section>
     </div>

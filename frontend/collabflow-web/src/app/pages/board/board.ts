@@ -2,16 +2,21 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { Task, TaskModel, TaskStatus } from '../../services/task';
+import { Project, ProjectModel } from '../../services/project';
+import { Team, TeamMembershipModel } from '../../services/team';
 
 @Component({
   selector: 'app-board',
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, DragDropModule],
   templateUrl: './board.html',
   styleUrl: './board.scss',
 })
 export class Board implements OnInit {
   projectId!: number;
+  project = signal<ProjectModel | null>(null);
+  members = signal<TeamMembershipModel[]>([]);
   tasks = signal<TaskModel[]>([]);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
@@ -29,12 +34,28 @@ export class Board implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private taskService: Task
+    private taskService: Task,
+    private projectService: Project,
+    private teamService: Team
   ) {}
 
   ngOnInit(): void {
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
+    this.loadProjectAndMembers();
     this.loadTasks();
+  }
+
+  loadProjectAndMembers(): void {
+    this.projectService.getProjectById(this.projectId).subscribe({
+      next: (project) => {
+        this.project.set(project);
+        this.teamService.getMembersForTeam(project.teamId).subscribe({
+          next: (members) => this.members.set(members),
+          error: (err) => console.error('Failed to load team members', err)
+        });
+      },
+      error: (err) => console.error('Failed to load project', err)
+    });
   }
 
   loadTasks(): void {
@@ -78,17 +99,14 @@ export class Board implements OnInit {
     });
   }
 
-  nextStatus(current: TaskStatus): TaskStatus | null {
-    if (current === 'TODO') return 'IN_PROGRESS';
-    if (current === 'IN_PROGRESS') return 'DONE';
-    return null;
-  }
+  drop(event: CdkDragDrop<TaskModel[]>, newStatus: TaskStatus): void {
+    if (event.previousContainer === event.container) {
+      return;
+    }
 
-  moveTask(task: TaskModel): void {
-    const next = this.nextStatus(task.status);
-    if (!next) return;
+    const task = event.item.data as TaskModel;
 
-    this.taskService.updateStatus(task.id, next).subscribe({
+    this.taskService.updateStatus(task.id, newStatus).subscribe({
       next: (updatedTask) => {
         this.tasks.update(tasks =>
           tasks.map(t => t.id === updatedTask.id ? updatedTask : t)
@@ -96,6 +114,23 @@ export class Board implements OnInit {
       },
       error: (err) => {
         console.error('Failed to update task status', err);
+      }
+    });
+  }
+
+  assignTask(task: TaskModel, event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const assigneeId = Number(select.value);
+    if (!assigneeId) return;
+
+    this.taskService.assignTask(task.id, assigneeId).subscribe({
+      next: (updatedTask) => {
+        this.tasks.update(tasks =>
+          tasks.map(t => t.id === updatedTask.id ? updatedTask : t)
+        );
+      },
+      error: (err) => {
+        console.error('Failed to assign task', err);
       }
     });
   }

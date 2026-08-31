@@ -31,4 +31,8 @@ export class Project {
   getProjectsForTeam(teamId: number): Observable<ProjectModel[]> {
     return this.http.get<ProjectModel[]>(`${this.baseUrl}/team/${teamId}`);
   }
+
+  getProjectById(projectId: number): Observable<ProjectModel> {
+    return this.http.get<ProjectModel>(`${this.baseUrl}/${projectId}`);
+  }
 }

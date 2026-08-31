@@ -31,4 +31,12 @@ public class ProjectController {
     public ResponseEntity<List<Project>> getProjectsForTeam(@PathVariable Long teamId) {
         return ResponseEntity.ok(projectService.getProjectsForTeam(teamId));
     }
+    @GetMapping("/{projectId}")
+    public ResponseEntity<?> getProject(@PathVariable Long projectId) {
+        try {
+            return ResponseEntity.ok(projectService.getProjectById(projectId));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }

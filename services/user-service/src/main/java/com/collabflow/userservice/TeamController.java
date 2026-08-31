@@ -44,4 +44,12 @@ public class TeamController {
         boolean exists = teamService.teamExists(teamId);
         return ResponseEntity.ok(exists);
     }
+    @GetMapping("/{teamId}/members")
+    public ResponseEntity<?> getMembers(@PathVariable Long teamId) {
+        try {
+            return ResponseEntity.ok(teamService.getMembersForTeam(teamId));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

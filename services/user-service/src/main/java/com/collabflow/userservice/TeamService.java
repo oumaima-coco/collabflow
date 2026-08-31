@@ -56,4 +56,11 @@ public class TeamService {
     public boolean teamExists(Long teamId) {
         return teamRepository.existsById(teamId);
     }
+
+    public List<TeamMembership> getMembersForTeam(Long teamId) {
+        if (!teamRepository.existsById(teamId)) {
+            throw new IllegalArgumentException("Team does not exist");
+        }
+        return membershipRepository.findByTeamId(teamId);
+    }
 }

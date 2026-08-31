@@ -24,4 +24,8 @@ public class ProjectService {
     public List<Project> getProjectsForTeam(Long teamId) {
         return projectRepository.findByTeamId(teamId);
     }
+    public Project getProjectById(Long projectId) {
+        return projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+    }
 }

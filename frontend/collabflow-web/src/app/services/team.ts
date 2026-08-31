@@ -16,6 +16,14 @@ export interface CreateTeamRequest {
   ownerId: number;
 }
 
+export interface TeamMembershipModel {
+  id: number;
+  teamId: number;
+  userId: number;
+  role: string;
+  joinedAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -30,5 +38,9 @@ export class Team {
 
   getTeamsForUser(userId: number): Observable<TeamModel[]> {
     return this.http.get<TeamModel[]>(`${this.baseUrl}/user/${userId}`);
+  }
+
+  getMembersForTeam(teamId: number): Observable<TeamMembershipModel[]> {
+    return this.http.get<TeamMembershipModel[]>(`${this.baseUrl}/${teamId}/members`);
   }
 }
