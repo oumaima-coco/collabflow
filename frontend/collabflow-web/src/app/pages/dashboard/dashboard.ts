@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Auth } from '../../services/auth';
 import { Team, TeamModel } from '../../services/team';
 import { Project, ProjectModel } from '../../services/project';
+import { Notification, NotificationModel } from '../../services/notification';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,13 +17,15 @@ export class Dashboard implements OnInit {
   userEmail = signal<string>('');
   teams = signal<TeamModel[]>([]);
   projects = signal<ProjectModel[]>([]);
+  notifications = signal<NotificationModel[]>([]);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
 
   constructor(
     private auth: Auth,
     private teamService: Team,
-    private projectService: Project
+    private projectService: Project,
+    private notificationService: Notification
   ) {}
 
   ngOnInit(): void {
@@ -31,6 +34,7 @@ export class Dashboard implements OnInit {
         this.userId.set(user.id);
         this.userEmail.set(user.email);
         this.loadTeams(user.id);
+        this.loadNotifications(user.id);
       },
       error: (err) => {
         this.error.set('Failed to load user info');
@@ -68,6 +72,17 @@ export class Dashboard implements OnInit {
         this.error.set('Failed to load projects');
         this.loading.set(false);
         console.error(err);
+      }
+    });
+  }
+
+  loadNotifications(userId: number): void {
+    this.notificationService.getNotificationsForUser(userId).subscribe({
+      next: (notifications) => {
+        this.notifications.set(notifications);
+      },
+      error: (err) => {
+        console.error('Failed to load notifications', err);
       }
     });
   }

@@ -3,12 +3,20 @@
     <h1>CollabFlow Dashboard</h1>
     <p *ngIf="userEmail()">Logged in as {{ userEmail() }}</p>
   </header>
-
   <div *ngIf="loading()">Loading...</div>
-
   <div *ngIf="error()" class="error">{{ error() }}</div>
-
   <div *ngIf="!loading() && !error()">
+    <section class="notifications-section">
+      <h2>Notifications</h2>
+      <ul *ngIf="notifications().length > 0; else noNotifications">
+        <li *ngFor="let notification of notifications()">
+          {{ notification.message }}
+        </li>
+      </ul>
+      <ng-template #noNotifications>
+        <p>No notifications yet.</p>
+      </ng-template>
+    </section>
     <section class="teams-section">
       <h2>Your Teams</h2>
       <ul *ngIf="teams().length > 0; else noTeams">
@@ -20,7 +28,6 @@
         <p>You don't belong to any teams yet.</p>
       </ng-template>
     </section>
-
     <section class="projects-section">
       <h2>Projects</h2>
       <ul *ngIf="projects().length > 0; else noProjects">
