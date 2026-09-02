@@ -21,4 +21,23 @@ export class Notification {
   getNotificationsForUser(userId: number): Observable<NotificationModel[]> {
     return this.http.get<NotificationModel[]>(`${this.baseUrl}/user/${userId}`);
   }
+
+  streamNotifications(userId: number): Observable<NotificationModel> {
+    return new Observable<NotificationModel>((subscriber) => {
+      const eventSource = new EventSource(`${this.baseUrl}/stream/${userId}`);
+
+      eventSource.addEventListener('notification', (event: MessageEvent) => {
+        const notification: NotificationModel = JSON.parse(event.data);
+        subscriber.next(notification);
+      });
+
+      eventSource.onerror = (error) => {
+        console.error('SSE connection error', error);
+      };
+
+      return () => {
+        eventSource.close();
+      };
+    });
+  }
 }

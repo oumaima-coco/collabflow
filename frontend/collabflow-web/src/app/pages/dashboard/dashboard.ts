@@ -1,6 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Auth } from '../../services/auth';
 import { Team, TeamModel } from '../../services/team';
 import { Project, ProjectModel } from '../../services/project';
@@ -12,7 +13,7 @@ import { Notification, NotificationModel } from '../../services/notification';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard implements OnInit {
+export class Dashboard implements OnInit, OnDestroy {
   userId = signal<number | null>(null);
   userEmail = signal<string>('');
   teams = signal<TeamModel[]>([]);
@@ -20,6 +21,8 @@ export class Dashboard implements OnInit {
   notifications = signal<NotificationModel[]>([]);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+
+  private notificationStreamSubscription: Subscription | null = null;
 
   constructor(
     private auth: Auth,
@@ -35,6 +38,7 @@ export class Dashboard implements OnInit {
         this.userEmail.set(user.email);
         this.loadTeams(user.id);
         this.loadNotifications(user.id);
+        this.subscribeToLiveNotifications(user.id);
       },
       error: (err) => {
         this.error.set('Failed to load user info');
@@ -42,6 +46,10 @@ export class Dashboard implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.notificationStreamSubscription?.unsubscribe();
   }
 
   loadTeams(userId: number): void {
@@ -83,6 +91,17 @@ export class Dashboard implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load notifications', err);
+      }
+    });
+  }
+
+  subscribeToLiveNotifications(userId: number): void {
+    this.notificationStreamSubscription = this.notificationService.streamNotifications(userId).subscribe({
+      next: (notification) => {
+        this.notifications.update(current => [notification, ...current]);
+      },
+      error: (err) => {
+        console.error('Notification stream error', err);
       }
     });
   }
