@@ -17,6 +17,7 @@ public class TaskService {
         this.authServiceClient = authServiceClient;
         this.taskEventProducer = taskEventProducer;
     }
+
     public Task createTask(Long projectId, String title, String description, Long assigneeId, LocalDate dueDate) {
         if (!projectRepository.existsById(projectId)) {
             throw new IllegalArgumentException("Project does not exist");
@@ -25,17 +26,34 @@ public class TaskService {
             throw new IllegalArgumentException("Assignee does not exist");
         }
         Task task = new Task(projectId, title, description, assigneeId, dueDate);
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+        taskEventProducer.publishTaskCreated(
+                new TaskCreatedEvent(savedTask.getId(), savedTask.getTitle(), savedTask.getProjectId())
+        );
+
+        return savedTask;
     }
+
     public List<Task> getTasksForProject(Long projectId) {
         return taskRepository.findByProjectId(projectId);
     }
+
     public Task updateStatus(Long taskId, TaskStatus newStatus) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+        String oldStatus = task.getStatus().toString();
         task.setStatus(newStatus);
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+        taskEventProducer.publishTaskStatusChanged(
+                new TaskStatusChangedEvent(savedTask.getId(), savedTask.getTitle(), savedTask.getProjectId(),
+                        oldStatus, newStatus.toString())
+        );
+
+        return savedTask;
     }
+
     public Task assignTask(Long taskId, Long assigneeId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
@@ -44,11 +62,9 @@ public class TaskService {
         }
         task.setAssigneeId(assigneeId);
         Task savedTask = taskRepository.save(task);
-
         taskEventProducer.publishTaskAssigned(
                 new TaskAssignedEvent(savedTask.getId(), savedTask.getTitle(), assigneeId, savedTask.getProjectId())
         );
-
         return savedTask;
     }
 
