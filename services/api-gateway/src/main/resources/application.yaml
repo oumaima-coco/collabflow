@@ -24,6 +24,10 @@ spring:
               uri: lb://NOTIFICATION-SERVICE
               predicates:
                 - Path=/notifications/**
+            - id: activity-service
+              uri: lb://ACTIVITY-SERVICE
+              predicates:
+                - Path=/activity/**
           globalcors:
             cors-configurations:
               '[/**]':

@@ -6,6 +6,8 @@ import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { Task, TaskModel, TaskStatus } from '../../services/task';
 import { Project, ProjectModel } from '../../services/project';
 import { Team, TeamMembershipModel } from '../../services/team';
+import { Activity, ActivityLogModel, CommentModel } from '../../services/activity';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-board',
@@ -15,12 +17,20 @@ import { Team, TeamMembershipModel } from '../../services/team';
 })
 export class Board implements OnInit {
   projectId!: number;
+  currentUserId = signal<number | null>(null);
   project = signal<ProjectModel | null>(null);
   members = signal<TeamMembershipModel[]>([]);
   tasks = signal<TaskModel[]>([]);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
   showForm = signal<boolean>(false);
+
+  expandedTaskId = signal<number | null>(null);
+  activityLog = signal<ActivityLogModel[]>([]);
+  comments = signal<CommentModel[]>([]);
+  commentForm = new FormGroup({
+    content: new FormControl('', [Validators.required]),
+  });
 
   todoTasks = computed(() => this.tasks().filter(t => t.status === 'TODO'));
   inProgressTasks = computed(() => this.tasks().filter(t => t.status === 'IN_PROGRESS'));
@@ -36,13 +46,19 @@ export class Board implements OnInit {
     private route: ActivatedRoute,
     private taskService: Task,
     private projectService: Project,
-    private teamService: Team
+    private teamService: Team,
+    private activityService: Activity,
+    private auth: Auth
   ) {}
 
   ngOnInit(): void {
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadProjectAndMembers();
     this.loadTasks();
+    this.auth.getCurrentUser().subscribe({
+      next: (user) => this.currentUserId.set(user.id),
+      error: (err) => console.error('Failed to load current user', err)
+    });
   }
 
   loadProjectAndMembers(): void {
@@ -132,6 +148,44 @@ export class Board implements OnInit {
       error: (err) => {
         console.error('Failed to assign task', err);
       }
+    });
+  }
+
+  toggleDetails(task: TaskModel): void {
+    if (this.expandedTaskId() === task.id) {
+      this.expandedTaskId.set(null);
+      return;
+    }
+
+    this.expandedTaskId.set(task.id);
+    this.loadActivityAndComments(task.id);
+  }
+
+  loadActivityAndComments(taskId: number): void {
+    this.activityService.getActivityForTask(taskId).subscribe({
+      next: (log) => this.activityLog.set(log),
+      error: (err) => console.error('Failed to load activity log', err)
+    });
+
+    this.activityService.getCommentsForTask(taskId).subscribe({
+      next: (comments) => this.comments.set(comments),
+      error: (err) => console.error('Failed to load comments', err)
+    });
+  }
+
+  submitComment(task: TaskModel): void {
+    if (this.commentForm.invalid) return;
+    const userId = this.currentUserId();
+    if (!userId) return;
+
+    const content = this.commentForm.value.content!;
+
+    this.activityService.createComment(task.id, { content, authorId: userId }).subscribe({
+      next: (newComment) => {
+        this.comments.update(comments => [...comments, newComment]);
+        this.commentForm.reset();
+      },
+      error: (err) => console.error('Failed to post comment', err)
     });
   }
 }

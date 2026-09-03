@@ -38,6 +38,26 @@
                 User #{{ member.userId }} ({{ member.role }})
               </option>
             </select>
+            <button (click)="toggleDetails(task)">{{ expandedTaskId() === task.id ? 'Hide Details' : 'View Details' }}</button>
+
+            <div class="task-details" *ngIf="expandedTaskId() === task.id">
+              <h4>Activity</h4>
+              <ul class="activity-list">
+                <li *ngFor="let entry of activityLog()">{{ entry.description }}</li>
+              </ul>
+
+              <h4>Comments</h4>
+              <ul class="comment-list">
+                <li *ngFor="let comment of comments()">
+                  <strong>User #{{ comment.authorId }}:</strong> {{ comment.content }}
+                </li>
+              </ul>
+
+              <form [formGroup]="commentForm" (ngSubmit)="submitComment(task)" class="comment-form">
+                <input formControlName="content" placeholder="Add a comment..." />
+                <button type="submit" [disabled]="commentForm.invalid">Post</button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
@@ -62,6 +82,26 @@
                 User #{{ member.userId }} ({{ member.role }})
               </option>
             </select>
+            <button (click)="toggleDetails(task)">{{ expandedTaskId() === task.id ? 'Hide Details' : 'View Details' }}</button>
+
+            <div class="task-details" *ngIf="expandedTaskId() === task.id">
+              <h4>Activity</h4>
+              <ul class="activity-list">
+                <li *ngFor="let entry of activityLog()">{{ entry.description }}</li>
+              </ul>
+
+              <h4>Comments</h4>
+              <ul class="comment-list">
+                <li *ngFor="let comment of comments()">
+                  <strong>User #{{ comment.authorId }}:</strong> {{ comment.content }}
+                </li>
+              </ul>
+
+              <form [formGroup]="commentForm" (ngSubmit)="submitComment(task)" class="comment-form">
+                <input formControlName="content" placeholder="Add a comment..." />
+                <button type="submit" [disabled]="commentForm.invalid">Post</button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
@@ -79,6 +119,26 @@
           <div class="task-card" *ngFor="let task of doneTasks()" cdkDrag [cdkDragData]="task">
             <h3>{{ task.title }}</h3>
             <p>{{ task.description }}</p>
+            <button (click)="toggleDetails(task)">{{ expandedTaskId() === task.id ? 'Hide Details' : 'View Details' }}</button>
+
+            <div class="task-details" *ngIf="expandedTaskId() === task.id">
+              <h4>Activity</h4>
+              <ul class="activity-list">
+                <li *ngFor="let entry of activityLog()">{{ entry.description }}</li>
+              </ul>
+
+              <h4>Comments</h4>
+              <ul class="comment-list">
+                <li *ngFor="let comment of comments()">
+                  <strong>User #{{ comment.authorId }}:</strong> {{ comment.content }}
+                </li>
+              </ul>
+
+              <form [formGroup]="commentForm" (ngSubmit)="submitComment(task)" class="comment-form">
+                <input formControlName="content" placeholder="Add a comment..." />
+                <button type="submit" [disabled]="commentForm.invalid">Post</button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
