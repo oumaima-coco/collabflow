@@ -1,0 +1,111 @@
+.notifications-page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6);
+}
+
+.back-link {
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+
+  &:hover {
+    color: var(--color-accent);
+  }
+}
+
+h1 {
+  font-size: 40px;
+  margin-bottom: var(--space-10);
+}
+
+.state-message {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 16px;
+
+  &.error {
+    color: var(--color-accent);
+  }
+}
+
+.notifications-full-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.notification-full-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  &.unread {
+    border-left: 5px solid var(--color-accent);
+    background: linear-gradient(90deg, var(--color-accent-light) 0%, var(--color-surface) 8%);
+  }
+}
+
+.notification-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-accent-gradient);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-accent);
+}
+
+.notification-body {
+  flex: 1;
+  min-width: 0;
+
+  p {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-1);
+  }
+}
+
+.notification-date {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.unread-tag {
+  flex-shrink: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 17px;
+  padding: var(--space-10) 0;
+}

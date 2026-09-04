@@ -1,27 +1,49 @@
-<div class="login-container">
-  <h1>Log in to CollabFlow</h1>
-
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="form-field">
-      <label for="email">Email</label>
-      <input id="email" type="email" formControlName="email" />
-      @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-        <span class="error">Please enter a valid email.</span>
-      }
+<div class="auth-page">
+  <div class="auth-brand-panel">
+    <div class="brand-content">
+      <div class="auth-logo">CF</div>
+      <h1>CollabFlow</h1>
+      <p class="brand-tagline">Plan projects, track work, and keep your team in sync — all in one place.</p>
+      <ul class="brand-features">
+        <li>Kanban boards with live drag-and-drop</li>
+        <li>Real-time notifications</li>
+        <li>Full activity history on every task</li>
+      </ul>
     </div>
+  </div>
 
-    <div class="form-field">
-      <label for="password">Password</label>
-      <input id="password" type="password" formControlName="password" />
-      @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-        <span class="error">Password is required.</span>
-      }
+  <div class="auth-form-panel">
+    <div class="auth-card">
+      <h2>Welcome back</h2>
+      <p class="auth-subtitle">Log in to continue to your workspace</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input id="email" type="email" class="input" formControlName="email" placeholder="you@example.com" />
+          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+            <span class="field-error">Please enter a valid email.</span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input id="password" type="password" class="input" formControlName="password" placeholder="••••••••" />
+          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+            <span class="field-error">Password is required.</span>
+          }
+        </div>
+
+        @if (errorMessage) {
+          <div class="auth-error">{{ errorMessage }}</div>
+        }
+
+        <button type="submit" class="btn btn-primary auth-submit" [disabled]="loginForm.invalid">Log in</button>
+      </form>
+
+      <p class="auth-footer">
+        Don't have an account? <a routerLink="/register">Sign up</a>
+      </p>
     </div>
-
-    @if (errorMessage) {
-      <div class="error server-error">{{ errorMessage }}</div>
-    }
-
-    <button type="submit" [disabled]="loginForm.invalid">Log in</button>
-  </form>
+  </div>
 </div>

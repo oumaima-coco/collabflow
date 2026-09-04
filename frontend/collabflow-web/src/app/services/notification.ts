@@ -22,6 +22,10 @@ export class Notification {
     return this.http.get<NotificationModel[]>(`${this.baseUrl}/user/${userId}`);
   }
 
+  markAllAsRead(userId: number): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/user/${userId}/read-all`, {});
+  }
+
   streamNotifications(userId: number): Observable<NotificationModel> {
     return new Observable<NotificationModel>((subscriber) => {
       const eventSource = new EventSource(`${this.baseUrl}/stream/${userId}`);

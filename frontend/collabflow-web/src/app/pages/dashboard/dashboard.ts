@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Auth } from '../../services/auth';
 import { Team, TeamModel } from '../../services/team';
@@ -21,6 +21,9 @@ export class Dashboard implements OnInit, OnDestroy {
   notifications = signal<NotificationModel[]>([]);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+  showNotifications = signal<boolean>(false);
+
+  unreadCount = computed(() => this.notifications().filter(n => !n.read).length);
 
   private notificationStreamSubscription: Subscription | null = null;
 
@@ -28,7 +31,8 @@ export class Dashboard implements OnInit, OnDestroy {
     private auth: Auth,
     private teamService: Team,
     private projectService: Project,
-    private notificationService: Notification
+    private notificationService: Notification,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +54,28 @@ export class Dashboard implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.notificationStreamSubscription?.unsubscribe();
+  }
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
+
+  toggleNotifications(): void {
+    const opening = !this.showNotifications();
+    this.showNotifications.set(opening);
+
+    if (opening && this.unreadCount() > 0) {
+      const userId = this.userId();
+      if (userId) {
+        this.notificationService.markAllAsRead(userId).subscribe({
+          next: () => {
+            this.notifications.update(current => current.map(n => ({ ...n, read: true })));
+          },
+          error: (err) => console.error('Failed to mark notifications as read', err)
+        });
+      }
+    }
   }
 
   loadTeams(userId: number): void {
