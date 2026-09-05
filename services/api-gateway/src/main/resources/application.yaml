@@ -3,44 +3,6 @@ server:
 spring:
   application:
     name: api-gateway
-  cloud:
-    gateway:
-      server:
-        webmvc:
-          routes:
-            - id: auth-service
-              uri: lb://AUTH-SERVICE
-              predicates:
-                - Path=/auth/**
-            - id: user-service
-              uri: lb://USER-SERVICE
-              predicates:
-                - Path=/teams/**
-            - id: project-service
-              uri: lb://PROJECT-SERVICE
-              predicates:
-                - Path=/projects/**
-            - id: notification-service
-              uri: lb://NOTIFICATION-SERVICE
-              predicates:
-                - Path=/notifications/**
-            - id: activity-service
-              uri: lb://ACTIVITY-SERVICE
-              predicates:
-                - Path=/activity/**
-          globalcors:
-            cors-configurations:
-              '[/**]':
-                allowedOrigins: "http://localhost:4200"
-                allowedMethods:
-                  - GET
-                  - POST
-                  - PUT
-                  - PATCH
-                  - DELETE
-                  - OPTIONS
-                allowedHeaders: "*"
-                allowCredentials: true
 eureka:
   client:
     service-url:

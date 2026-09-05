@@ -1,12 +1,9 @@
 version: "3.9"
-
 # CollabFlow — local infrastructure
 # One Postgres instance per service, matching the database-per-service rule
 # in ARCHITECTURE.md. Each service will point at its own DB via its
 # application.yml / application.properties once we build it.
-
 services:
-
   auth-db:
     image: postgres:16-alpine
     container_name: collabflow-auth-db
@@ -19,7 +16,6 @@ services:
       - "5432:5432"
     volumes:
       - auth_db_data:/var/lib/postgresql/data
-
   user-db:
     image: postgres:16-alpine
     container_name: collabflow-user-db
@@ -32,7 +28,6 @@ services:
       - "5433:5432"
     volumes:
       - user_db_data:/var/lib/postgresql/data
-
   project-db:
     image: postgres:16-alpine
     container_name: collabflow-project-db
@@ -45,7 +40,6 @@ services:
       - "5434:5432"
     volumes:
       - project_db_data:/var/lib/postgresql/data
-
   notification-db:
     image: postgres:16-alpine
     container_name: collabflow-notification-db
@@ -58,7 +52,6 @@ services:
       - "5435:5432"
     volumes:
       - notification_db_data:/var/lib/postgresql/data
-
   activity-db:
     image: postgres:16-alpine
     container_name: collabflow-activity-db
@@ -71,7 +64,6 @@ services:
       - "5436:5432"
     volumes:
       - activity_db_data:/var/lib/postgresql/data
-
   # Kafka in KRaft mode (no Zookeeper needed) — added in Phase 8 for
   # async messaging between project-service and notification-service.
   kafka:
@@ -90,7 +82,13 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-
+  # Redis — added in Phase 12 to back the gateway's rate limiter.
+  redis:
+    image: redis:7-alpine
+    container_name: collabflow-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
 volumes:
   auth_db_data:
   user_db_data:
